@@ -15,6 +15,15 @@ export type Movie = {
   status?: string
   officialSite?: string
   url?: string
+  cast?: string[]
+}
+
+type TvMazeShow = Omit<Movie, "summary" | "image" | "cast"> & {
+  summary?: string | null
+  image?: Movie["image"]
+  _embedded?: {
+    cast?: { person?: { name?: string } }[]
+  }
 }
 
 const FAVORITES_KEY = "tvmovies-favorites"
@@ -83,10 +92,10 @@ export const getMovies = async (): Promise<Movie[]> => {
       throw new Error("TVMaze request failed")
     }
 
-    const data = await response.json()
-    const shows = Array.isArray(data) ? data : []
+    const data: unknown = await response.json()
+    const shows = Array.isArray(data) ? data as TvMazeShow[] : []
 
-    return shows.slice(0, 12).map((show: any) => ({
+    return shows.slice(0, 12).map((show) => ({
       id: show.id,
       name: show.name,
       summary: show.summary ? show.summary.replace(/<[^>]+>/g, "") : "No description available.",
@@ -106,13 +115,13 @@ export const getMovies = async (): Promise<Movie[]> => {
 
 export const getMovieById = async (id: number): Promise<Movie | undefined> => {
   try {
-    const response = await fetch(`https://api.tvmaze.com/shows/${id}`)
+    const response = await fetch(`https://api.tvmaze.com/shows/${id}?embed=cast`)
 
     if (!response.ok) {
       throw new Error("TVMaze detail request failed")
     }
 
-    const show = await response.json()
+    const show = await response.json() as TvMazeShow
 
     return {
       id: show.id,
@@ -126,6 +135,7 @@ export const getMovieById = async (id: number): Promise<Movie | undefined> => {
       status: show.status,
       officialSite: show.officialSite,
       url: show.url,
+      cast: show._embedded?.cast?.slice(0, 8).map((entry) => entry.person?.name).filter((name): name is string => Boolean(name)),
     }
   } catch {
     return fallbackMovies.find((movie) => movie.id === id)

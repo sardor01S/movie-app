@@ -31,7 +31,7 @@ const App = () => {
   }
 
   return (
-    <div className={theme === "dark" ? "bg-[#020817] text-white" : "bg-[#f8fafc] text-slate-900"}>
+    <div className={theme === "dark" ? "bg-[#0b0f19] text-white" : "bg-[#f8fafc] text-slate-900"}>
       <div className="min-h-screen transition-colors duration-300">
         <Header
           theme={theme}
@@ -42,7 +42,7 @@ const App = () => {
           onSignOut={handleSignOut}
         />
 
-        <div className="pt-20">
+        <div className="pt-25.5 md:pt-15.5">
           <UserRoutes
             theme={theme}
             isLoggedIn={userName !== "Guest"}

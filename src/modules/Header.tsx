@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom"
+import { Clapperboard, Heart, Home, Moon, Sun, Tv, UserRound } from "lucide-react"
+import { Link, NavLink } from "react-router-dom"
 import { PATH } from "../components"
 
 type HeaderProps = {
@@ -12,91 +13,59 @@ type HeaderProps = {
 
 const Header = ({ theme, onToggleTheme, isLoggedIn, userName, onSignIn, onSignOut }: HeaderProps) => {
   const isDark = theme === "dark"
+  const links = [
+    { to: PATH.home, label: "Home", icon: Home },
+    { to: PATH.movies, label: "Movies", icon: Tv },
+    { to: PATH.favourites, label: "Favourites", icon: Heart },
+  ]
+  const navClass = ({ isActive }: { isActive: boolean }) => `relative inline-flex items-center gap-2 py-2 text-sm font-semibold transition ${isActive ? `${isDark ? "text-white" : "text-slate-900"} after:absolute after:inset-x-0 after:-bottom-[1px] after:h-0.5 after:bg-gradient-to-r after:from-violet-400 after:to-cyan-300` : isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`
 
   return (
-    <header
-      className={
-        isDark
-          ? "fixed left-0 right-0 top-0 z-40 border-b border-violet-500/30 bg-slate-950/80 backdrop-blur-xl"
-          : "fixed left-0 right-0 top-0 z-40 border-b border-violet-200 bg-white/80 backdrop-blur-xl"
-      }
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 text-lg text-white shadow-lg shadow-violet-500/30">
-            🎬
+    <header className={`fixed inset-x-0 top-0 z-40 border-b backdrop-blur-2xl ${isDark ? "border-white/8 bg-[#0b0f19]/75" : "border-slate-200/80 bg-white/80"}`}>
+      <div className="mx-auto flex h-15.5 max-w-360 items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
+        <Link to={PATH.home} className="flex shrink-0 items-center gap-2.5" aria-label="TwistFlix home">
+          <span className="grid size-9 place-items-center rounded-xl bg-linear-to-br from-violet-500 to-cyan-400 text-white shadow-lg shadow-violet-950/30">
+            <Clapperboard size={19} strokeWidth={2.2} />
           </span>
-          <h1 className="text-2xl font-black tracking-tight text-violet-400">TwistFlix</h1>
-        </div>
+          <span className={`font-bold tracking-normal ${isDark ? "text-white" : "text-slate-950"}`}>Twist<span className="text-cyan-400">Flix</span></span>
+        </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          <NavLink
-            to={PATH.home}
-            className={({ isActive }) =>
-              `text-lg font-medium transition ${
-                isActive ? "text-violet-400" : isDark ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-              }`
-            }
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to={PATH.movies}
-            className={({ isActive }) =>
-              `text-lg font-medium transition ${
-                isActive ? "text-violet-400" : isDark ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-              }`
-            }
-          >
-            Movies
-          </NavLink>
-          <NavLink
-            to={PATH.favourites}
-            className={({ isActive }) =>
-              `text-lg font-medium transition ${
-                isActive ? "text-violet-400" : isDark ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-              }`
-            }
-          >
-            Favourites
-          </NavLink>
+        <nav className="hidden h-full items-center gap-8 md:flex" aria-label="Main navigation">
+          {links.map(({ to, label }) => <NavLink key={to} to={to} end={to === PATH.home} className={navClass}>{label}</NavLink>)}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onToggleTheme}
-            className={
-              isDark
-                ? "rounded-full border border-violet-400/50 bg-violet-500/10 px-3 py-2 text-sm font-medium text-violet-300 transition hover:bg-violet-500/20"
-                : "rounded-full border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-700 transition hover:border-violet-300"
-            }
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className={`grid size-9 place-items-center rounded-full border transition ${isDark ? "border-white/10 bg-white/4 text-slate-300 hover:border-white/25 hover:text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"}`}
           >
-            {theme === "dark" ? "Light" : "Dark"}
+            {isDark ? <Sun size={17} /> : <Moon size={17} />}
           </button>
 
           {isLoggedIn ? (
-            <div className="flex items-center gap-2 rounded-full border border-violet-500/30 bg-slate-900/80 px-3 py-2 shadow-lg shadow-violet-900/20">
-              <span className="text-sm font-medium text-white">{userName}</span>
-              <button
-                type="button"
-                onClick={onSignOut}
-                className="text-sm font-medium text-violet-300 hover:text-white"
-              >
-                Sign out
-              </button>
+            <div className={`flex items-center gap-2 rounded-full border py-1 pl-1 pr-2 sm:pr-3 ${isDark ? "border-white/10 bg-white/4.5" : "border-slate-200 bg-white"}`}>
+              <span className="grid size-7 place-items-center rounded-full bg-linear-to-br from-violet-500 to-cyan-400 text-xs font-bold text-white">{userName.slice(0, 1).toUpperCase()}</span>
+              <span className={`hidden max-w-24 truncate text-xs font-semibold sm:inline ${isDark ? "text-slate-200" : "text-slate-800"}`}>{userName}</span>
+              <button type="button" onClick={onSignOut} title="Sign out" aria-label="Sign out" className={`hidden text-xs font-medium sm:inline ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>Exit</button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={onSignIn}
-              className="rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition hover:opacity-95"
-            >
-              Sign in
+            <button type="button" onClick={onSignIn} className="inline-flex h-9 items-center gap-2 rounded-full bg-white px-4 text-xs font-bold text-slate-950 transition hover:bg-cyan-100">
+              <UserRound size={15} /> <span className="hidden sm:inline">Sign in</span>
             </button>
           )}
         </div>
       </div>
+
+      <nav className={`flex h-10 items-center justify-center gap-9 border-t px-4 md:hidden ${isDark ? "border-white/6" : "border-slate-200"}`} aria-label="Mobile navigation">
+        {links.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} end={to === PATH.home} className={({ isActive }) => `inline-flex items-center gap-1.5 text-xs font-semibold transition ${isActive ? "text-cyan-300" : isDark ? "text-slate-400" : "text-slate-500"}`}>
+            <Icon size={14} /> {label}
+          </NavLink>
+        ))}
+      </nav>
     </header>
   )
 }
